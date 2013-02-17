@@ -433,7 +433,7 @@ li {
                                                             {% for tweet in tweets %}
                                                             <li>
                                                               <div class="tweets">
-                                                              <img src="cid:{{ tweet.screen_name }}_av" class="avatar">
+                                                              <img src="{{ tweet.profile_image }}" class="avatar">
                                                               <div class="tweet-body">
                                                                 <div class="tweet-header">
                                                                   <span class="real_name">{{ tweet.real_name }}</span> <span class="screen_name">@{{ tweet.screen_name }}</span>
@@ -444,7 +444,7 @@ li {
                                                               </div>
                                                             </li>
                                                             {% if tweet.media %}
-                                                              <img src="cid:{{tweet.id}}_im" class="tweet-images">
+                                                              <img src="{{ tweet.media }}" class="tweet-images">
                                                             {% endif %}
                                                             {% endfor %}
                                                           </ul>
