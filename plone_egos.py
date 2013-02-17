@@ -10,12 +10,7 @@ import os
 
 def send_hashtag_report(hashtag, email_to):
     tweets = get_tweets(hashtag)
-    # avatars, tweet_images = get_images(tweets)
-    # html_email, plain_email = prepare_email(tweets)
-    # send_email(email_to, "smtp.gmail.com", 587, "nbpyclasstest@gmail.com", 
-    #            "Emerald Sprint Report", html_email, plain_email, avatars, tweet_images)
     write_webpage(tweets)
-    # delete_files(avatars, tweet_images)
     print "Booyah!"
 
 def get_tweets(hashtag):
@@ -47,6 +42,19 @@ def get_tweets(hashtag):
         else:
             next_page = False
     return tweet_list
+
+def write_webpage(tweets):
+    print "Preparing web page..."
+    env = Environment(loader=FileSystemLoader('templates'))
+    html_template = env.get_template('simple-basic.html')
+    webpage = html_template.render(tweets=tweets).encode('utf-8')
+    if not os.path.exists('www'):
+        os.makedirs('www')
+    f = open('www/index.html', 'w')
+    f.write(webpage)
+
+if __name__ == '__main__':
+    send_hashtag_report("emeraldsprint", ["james.sutterfield@gmail.com"])
 
 # def get_images(tweet_list):
 #     print "Downloading images..."
@@ -113,16 +121,6 @@ def get_tweets(hashtag):
 #     session.sendmail(from_address, addresses, msgRoot.as_string())
 #     session.quit()
 
-def write_webpage(tweets):
-    print "Preparing web page..."
-    env = Environment(loader=FileSystemLoader('templates'))
-    html_template = env.get_template('simple-basic.html')
-    webpage = html_template.render(tweets=tweets).encode('utf-8')
-    if not os.path.exists('www'):
-        os.makedirs('www')
-    f = open('www/index.html', 'w')
-    f.write(webpage)
-
 # def delete_files(avatars, tweet_images):
 #     print "Cleaing up directory..."
 #     dir_path = os.path.abspath(os.path.dirname(__file__))
@@ -130,6 +128,3 @@ def write_webpage(tweets):
 #         os.remove(dir_path + "/" + "{0}_av".format(avatar))
 #     for tweet_image in tweet_images:
 #         os.remove(dir_path + "/" + tweet_image)
-
-if __name__ == '__main__':
-    send_hashtag_report("emeraldsprint", ["james.sutterfield@gmail.com"])
