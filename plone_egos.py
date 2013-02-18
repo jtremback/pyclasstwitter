@@ -8,9 +8,10 @@ import smtplib
 import premailer
 import os
 
-def send_hashtag_report(hashtag, email_to):
+def send_hashtag_report(hashtag, length):
+    delete_files()
     tweets = get_tweets(hashtag)
-    write_webpage(tweets)
+    write_webpage(tweets, length)
     print "Booyah!"
 
 def get_tweets(hashtag):
@@ -43,18 +44,32 @@ def get_tweets(hashtag):
             next_page = False
     return tweet_list
 
-def write_webpage(tweets):
+def chunks(l, n):
+    return [l[i:i+n] for i in range(0, len(l), n)]
+
+def write_webpage(tweets, length):
     print "Preparing web page..."
     env = Environment(loader=FileSystemLoader('templates'))
     html_template = env.get_template('simple-basic.html')
-    webpage = html_template.render(tweets=tweets).encode('utf-8')
+
     if not os.path.exists('www'):
         os.makedirs('www')
-    f = open('www/index.html', 'w')
-    f.write(webpage)
+    i = 0
+
+    sliced_tweets = chunks(tweets, length)
+    for chunk in sliced_tweets:
+        webpage = html_template.render(tweets=chunk).encode('utf-8')
+        f = open('www/index%s.html'% i, 'w')
+        f.write(webpage)
+        i += 1
+
+def delete_files():
+    print "Cleaing up directory..."
+    dir_path = os.path.abspath(os.path.dirname(__file__))
+    os.remove(dir_path + "/www")
 
 if __name__ == '__main__':
-    send_hashtag_report("emeraldsprint", ["james.sutterfield@gmail.com"])
+    send_hashtag_report("emeraldsprint", 1)
 
 # def get_images(tweet_list):
 #     print "Downloading images..."
@@ -120,11 +135,3 @@ if __name__ == '__main__':
 #     session.login(from_address, password)
 #     session.sendmail(from_address, addresses, msgRoot.as_string())
 #     session.quit()
-
-# def delete_files(avatars, tweet_images):
-#     print "Cleaing up directory..."
-#     dir_path = os.path.abspath(os.path.dirname(__file__))
-#     for avatar in avatars:
-#         os.remove(dir_path + "/" + "{0}_av".format(avatar))
-#     for tweet_image in tweet_images:
-#         os.remove(dir_path + "/" + tweet_image)
