@@ -4,9 +4,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         
         <!-- Facebook sharing information tags -->
-        <meta property="og:title" content="*|MC:SUBJECT|*" />
+        <meta property="og:title" content="*|MC:HAMMER|*" />
         
-        <title>*|MC:SUBJECT|*</title>
+        <title>*|MC:HAMMER|*</title>
 		<style type="text/css">
 			/* Client-specific Styles */
 			#outlook a{padding:0;} /* Force Outlook to provide a "view in browser" button. */
@@ -433,7 +433,7 @@ li {
                                                             {% for tweet in tweets %}
                                                             <li>
                                                               <div class="tweets">
-                                                              <img src="{{ tweet.profile_image }}" class="avatar">
+                                                              <img src="{{ tweet.profile_image }}" class="avatar"  width="48" height="48">
                                                               <div class="tweet-body">
                                                                 <div class="tweet-header">
                                                                   <span class="real_name">{{ tweet.real_name }}</span> <span class="screen_name">@{{ tweet.screen_name }}</span>
@@ -472,6 +472,17 @@ li {
                     </td>
                 </tr>
             </table>
+            <nav role="pagination">
+				<div>
+				{% if page_data['prev_page'] %}
+				<a href = {{'snuf_%d.html' % page_data.prev_page_num }} >&larr; {{ page_data.prev_page_num }}</a>
+				{% endif %}
+				<a herf = "">{{page_data['current_page']}}</a>
+				{% if page_data['next_page'] %}
+				<a href = {{'snuf_%d.html' % page_data.next_page_num }}>{{ page_data.next_page_num }} &rarr;</a>
+				{% endif %}
+				</div>
+			</nav>
         </center>
     </body>
 </html>

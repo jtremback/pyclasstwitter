@@ -1,8 +1,8 @@
 import requests
-import urllib
 from jinja2 import Environment, FileSystemLoader
 import os
 import shutil
+
 
 def send_hashtag_report(hashtag, length):
     if os.path.exists('www'):
@@ -10,6 +10,7 @@ def send_hashtag_report(hashtag, length):
     tweets = get_tweets(hashtag)
     write_webpage(tweets, length)
     print "Booyah!"
+
 
 def get_tweets(hashtag):
     print "Retrieving tweets..."
@@ -41,24 +42,33 @@ def get_tweets(hashtag):
             next_page = False
     return tweet_list
 
+
 def chunks(l, n):
-    return [l[i:i+n] for i in range(0, len(l), n)]
+    return [l[i:i + n] for i in range(0, len(l), n)]
+
 
 def write_webpage(tweets, length):
     print "Preparing web page..."
     env = Environment(loader=FileSystemLoader('templates'))
     html_template = env.get_template('simple-basic.html')
-
     if not os.path.exists('www'):
         os.makedirs('www')
-    i = 0
-
+    i = 1
     sliced_tweets = chunks(tweets, length)
     for chunk in sliced_tweets:
-        webpage = html_template.render(tweets=chunk).encode('utf-8')
-        f = open('www/snunderflow_%s.html'% i, 'w')
+        page_data = {'prev_page': False, 'next_page': False}
+        page_data['current_page'] = i
+        if len(sliced_tweets) != i:
+            page_data['next_page'] = True
+        if i != 1:
+            page_data['prev_page'] = True
+        page_data['next_page_num'] = i + 1
+        page_data['prev_page_num'] = i - 1
+        webpage = html_template.render(tweets=chunk, page_data=page_data).encode('utf-8')
+        f = open('www/snuf_%s.html' % i, 'w')
         f.write(webpage)
         i += 1
+
 
 def delete_files():
     print "Cleaing up directory..."
@@ -67,68 +77,3 @@ def delete_files():
 
 if __name__ == '__main__':
     send_hashtag_report("emeraldsprint", 10)
-
-# def get_images(tweet_list):
-#     print "Downloading images..."
-#     avatars_downloaded = []
-#     tweet_images_downloaded = []
-#     for tweet in tweet_list:
-#         if tweet['screen_name'] not in avatars_downloaded:
-#             urllib.urlretrieve(tweet['profile_image'], '{0}_av'.format(tweet['screen_name']))
-#             avatars_downloaded.append(tweet['screen_name'])
-#         if tweet['media']:
-#             urllib.urlretrieve(tweet['media'], '{0}_im'.format(tweet['id']))
-#             tweet_images_downloaded.append('{0}_im'.format(tweet['id']))
-#     return avatars_downloaded, tweet_images_downloaded
-
-# def prepare_email(tweets):
-#     print "Preparing email..."
-#     env = Environment(loader=FileSystemLoader('templates'))
-#     html_template = env.get_template('simple-basic.html')
-#     plain_template = env.get_template('plaintext_email')
-#     html_email = html_template.render(tweets=tweets)
-#     plain_email = plain_template.render(tweets=tweets)
-#     # Converts all css stylings from those in the <head></head> into inline styling
-#     # so the email client doesn't rip them out.
-#     html_email = premailer.transform(html_email)
-#     return html_email, plain_email
-
-# def send_email(addresses, host, port, from_address, subject, html_email,
-#                plain_email, avatars, tweet_images):
-#     password = raw_input('Password: ')
-#     print "Sending email..."
-#     msgRoot = MIMEMultipart('related')
-#     msgRoot['Subject'] = subject
-#     msgRoot['From'] = from_address
-#     msgRoot['To'] = ', '.join(addresses)
-#     msgRoot.epilogue = ''
-
-#     msgAlternative = MIMEMultipart('alternative')
-#     msgRoot.attach(msgAlternative)
-
-#     msgText = MIMEText(plain_email.encode('utf-8'))
-#     msgAlternative.attach(msgText)
-
-#     msgText = MIMEText(html_email.encode('utf-8'), 'html')
-#     msgAlternative.attach(msgText)
-
-#     for avatar in avatars:
-#         with open("{0}_av".format(avatar), 'rb') as fp:
-#             msgImage = MIMEImage(fp.read())
-#             msgImage.add_header('Content-ID', '<{0}_av>'.format(avatar))
-#             msgRoot.attach(msgImage)
-#     for tweet_image in tweet_images:
-#         with open(tweet_image, 'rb') as fp:
-#             msgImage = MIMEImage(fp.read())
-#             msgImage.add_header('Content-ID', '<{0}>'.format(tweet_image))
-#             msgRoot.attach(msgImage)
-#     with open("plone-logo.png", 'rb') as fp:
-#         msgImage = MIMEImage(fp.read())
-#         msgImage.add_header('Content-ID', '<plone-logo.png>')
-#         msgRoot.attach(msgImage)    
-
-#     session = smtplib.SMTP(host, port)
-#     session.starttls()
-#     session.login(from_address, password)
-#     session.sendmail(from_address, addresses, msgRoot.as_string())
-#     session.quit()
