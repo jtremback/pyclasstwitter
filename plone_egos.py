@@ -1,15 +1,12 @@
 import requests
 import urllib
 from jinja2 import Environment, FileSystemLoader
-from email.MIMEMultipart import MIMEMultipart
-from email.MIMEText import MIMEText
-from email.MIMEImage import MIMEImage
-import smtplib
-import premailer
 import os
+import shutil
 
 def send_hashtag_report(hashtag, length):
-    delete_files()
+    if os.path.exists('www'):
+        delete_files()
     tweets = get_tweets(hashtag)
     write_webpage(tweets, length)
     print "Booyah!"
@@ -59,17 +56,17 @@ def write_webpage(tweets, length):
     sliced_tweets = chunks(tweets, length)
     for chunk in sliced_tweets:
         webpage = html_template.render(tweets=chunk).encode('utf-8')
-        f = open('www/index%s.html'% i, 'w')
+        f = open('www/snunderflow_%s.html'% i, 'w')
         f.write(webpage)
         i += 1
 
 def delete_files():
     print "Cleaing up directory..."
     dir_path = os.path.abspath(os.path.dirname(__file__))
-    os.remove(dir_path + "/www")
+    shutil.rmtree(dir_path + "/www")
 
 if __name__ == '__main__':
-    send_hashtag_report("emeraldsprint", 1)
+    send_hashtag_report("emeraldsprint", 10)
 
 # def get_images(tweet_list):
 #     print "Downloading images..."
