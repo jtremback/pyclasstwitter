@@ -5,6 +5,7 @@ import shutil
 
 
 def send_hashtag_report(hashtag, length):
+    """create the page from the twitter hashtag based on length"""
     if os.path.exists('www'):
         delete_files()
     tweets = get_tweets(hashtag)
@@ -13,6 +14,8 @@ def send_hashtag_report(hashtag, length):
 
 
 def get_tweets(hashtag):
+    """send in a hashtag without # tag.  it is hardcoded
+    """
     print "Retrieving tweets..."
     tweet_list = []
     search_url = "http://search.twitter.com/search.json?q=%23{0}&include_entities=true".format(hashtag)
@@ -44,10 +47,13 @@ def get_tweets(hashtag):
 
 
 def chunks(l, n):
+    """Takes tweet list and chunks it into a list of lists based on the number chosen"""
     return [l[i:i + n] for i in range(0, len(l), n)]
 
 
 def write_webpage(tweets, length):
+    """Writes based on tweet list and how many tweets you want
+    Page data is formed here for use in pagification"""
     print "Preparing web page..."
     env = Environment(loader=FileSystemLoader('templates'))
     html_template = env.get_template('simple-basic.html')
@@ -65,12 +71,13 @@ def write_webpage(tweets, length):
         page_data['next_page_num'] = i + 1
         page_data['prev_page_num'] = i - 1
         webpage = html_template.render(tweets=chunk, page_data=page_data).encode('utf-8')
-        f = open('www/snuf_%s.html' % i, 'w')
-        f.write(webpage)
+        with open('www/snuf_%s.html' % i, 'wb') as f:
+            f.write(webpage)
         i += 1
 
 
 def delete_files():
+    """Deletes file www from the filesystem"""
     print "Cleaing up directory..."
     dir_path = os.path.abspath(os.path.dirname(__file__))
     shutil.rmtree(dir_path + "/www")
