@@ -64,6 +64,7 @@ def write_webpage(tweets, length):
     for chunk in sliced_tweets:
         page_data = {'prev_page': False, 'next_page': False}
         page_data['current_page'] = i
+        page_data['total_pages'] = len(sliced_tweets)
         if len(sliced_tweets) != i:
             page_data['next_page'] = True
         if i != 1:
@@ -83,4 +84,4 @@ def delete_files():
     shutil.rmtree(dir_path + "/www")
 
 if __name__ == '__main__':
-    send_hashtag_report("emeraldsprint", 10)
+    send_hashtag_report("trending", 10)

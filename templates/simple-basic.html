@@ -474,12 +474,18 @@ li {
             </table>
             <nav role="pagination">
 				<div>
-				{% if page_data['prev_page'] %}
-				<a href = {{'snuf_%d.html' % page_data.prev_page_num }} >&larr; {{ page_data.prev_page_num }}</a>
+				{% if page_data.prev_page %}
+				<a href="snuf_{{ page_data.current_page - 1 }}.html">&larr;</a>
 				{% endif %}
-				<a herf = "">{{page_data['current_page']}}</a>
-				{% if page_data['next_page'] %}
-				<a href = {{'snuf_%d.html' % page_data.next_page_num }}>{{ page_data.next_page_num }} &rarr;</a>
+				{% for number in range(page_data.total_pages) %}
+				  {% if number + 1 == page_data.current_page %}
+				    {{ page_data.current_page }}
+				  {% else %}
+				    <a href="snuf_{{ number + 1 }}.html">{{ number + 1 }}</a>
+				  {% endif %}
+				{% endfor %}
+				{% if page_data.next_page %}
+				<a href="snuf_{{ page_data.current_page + 1 }}.html">&rarr;</a>
 				{% endif %}
 				</div>
 			</nav>
